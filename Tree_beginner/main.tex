@@ -1,0 +1,394 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[linguistics]{forest}
+\usepackage{linguex}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{qtree}
+\usepackage{setspace}
+\usepackage{url}
+\usepackage[normalem]{ulem}
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ }
+
+\title{A Quickstart Guide for Drawing Tree Diagrams in \LaTeX}
+\author{\textbf{Lisa Shao}}
+\date{October 21, 2025}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This guide aims to provide a beginner-friendly introduction to using the \texttt{forest} and \texttt{qtree} packages in \LaTeX{} to draw clean tree diagrams for your linguistic assignments. ;-)
+\end{abstract}
+
+\tableofcontents
+
+\begin{spacing}{1.5}
+\section{The \LaTeX\ Basics: Preamble and Packages}
+\LaTeX\ (pronounced /l'tek/) is powerful because of its \textbf{Preamble}, which defines the document type and loads special packages that give you extra features. Using \LaTeX\ ensures your work is \textbf{automatic, professional, and consistent}.
+
+The preamble is where you tell the compiler what tools you'll be using. Since we're drawing trees, we need these packages:
+\begin{center}
+ \noindent\texttt{\string\usepackage[linguistics]\{forest\}} \\
+% This is the tree-drawing package
+\texttt{\string\usepackage\{amsmath, amssymb\}} \\ % For math symbols and semantic types
+\texttt{\string\usepackage\{tikz\}}        % The original    
+\end{center}
+
+Always put this line in your preamble to tell \LaTeX\ you'll be using this tool.
+
+\textbf{A Note } The \texttt{forest} package is actually built on top of the incredibly powerful \textbf{TikZ} package. We won't study TikZ directly because its manual is over 1,000 pages, but \texttt{forest} gives us an easy, user-friendly way specifically for drawing trees.
+
+\section{Drawing Trees with the \texttt{forest} Package}
+
+The \texttt{forest} package uses a simple bracket notation to represent the hierarchy of a tree.
+
+\subsection{Environment Setting}
+
+Before any tree coding starts, you must create the \textbf{environment} where the code will run. \textbf{NEVER} forget these lines:
+
+\begin{center}
+\verb|\begin{forest}| \\
+\verb|type your codes here...|\\
+\verb|\end{forest}|
+\end{center}
+
+
+
+\noindent \textbf{Note:} If you use an editor like VS Code, type \texttt{\textbackslash begin\{forest\}}, and the closing command \texttt{\textbackslash end\{forest\}} will often appear automatically!
+
+\subsection{Simple Tree Structure}
+
+Each set of brackets \texttt{[]} represents a single \textbf{node} in the tree. The first item inside the brackets is the node's label (the \textbf{mother}), and anything else inside represents its \textbf{daughters}.
+
+\subsubsection*{Example 1: A Single Branch}
+The code \texttt{[N [Kitty]]} produces:
+
+\ex. \begin{forest}
+[N [Kitty]]
+\end{forest}
+
+\subsubsection*{Example 2: Two Branches (\textit{Kitty meows})}
+To draw a branching structure, you simply place the daughter nodes next to each other, separated by a space, inside the mother node's brackets.
+
+The sentence \textit{Kitty meows} has a structure like: S $\rightarrow$ DP+VP.
+
+We can firstly start with the POS (part of speech) labeling since it is unary in this case.
+\begin{center}
+\noindent\verb|\begin{forest}| \\
+\verb|[ProperN[Kitty]]| \\
+\verb|[V_{itr} [Meows]]| \\
+\verb|\end{forest}| \\   
+\end{center}
+
+
+Then we can do the syntactic analysis, adding \textbf{S, DP and VP}.
+
+\begin{center}
+\verb|\begin{forest}| \\
+\verb|[S| \\
+\verb|    [DP [ProperN [Kitty]]]|\\
+\verb|    [VP [V_{itr} [meows]]]|\\
+\verb|]| \\
+\verb|\end{forest}|
+\end{center}
+
+
+\noindent This produces:
+
+\ex. 
+\begin{forest}
+[S
+    [DP [ProperN [Kitty]]]
+    [VP [V_{itr} [meows]]]
+]
+\end{forest}
+
+\subsection{Adjusting node spacing}
+Although \texttt{forest} will arrange the nodes in the tree for you, you can still adjust both the horizontal and the vertical spacing, and the empty space around the nodes. 
+
+The default setting is
+\begin{center}
+\verb|\forestset{default preamble={for tree={s sep=10mm, inner sep=0, l=0}}}|   
+\end{center}
+
+
+\noindent \textbf{Something to note}:
+\begin{itemize}
+    \item The horizontal spacing is controlled by the \texttt{s sep} command, the vertical (or level) spacing by the \texttt{l} command. 
+    \item  The \texttt{inner sep} command controls the empty space around the nodes.
+\end{itemize}
+
+You can specify absolute values for these parameters, as in the example
+below, or increase or decrease their default values as calculated by forest.
+
+This is done either by multiplication (e.g. l*=3 multiplies the default level distance by 3), or by addition or subtraction (e.g. l+=3mm adds 3mm to the default level distance, l-=3mm subtracts 3mm).
+
+
+
+
+\subsection{Complex Tree Structure}
+Let's analyze the transitive sentence \textit{Andy likes Billy} with a complete phrase structure.
+\begin{enumerate}
+    \item Start by encoding each word with its POS label: \texttt{[ProperN [Andy]]}, \texttt{[V [likes]]}, \texttt{[ProperN [Billy]]}.
+    \item Group them into phrases using brackets: $\rightarrow$ \texttt{[NP [ProperN [Andy]]} and \texttt{[NP [ProperN [Billy]]}.
+    \item Finally, link everything up to the main S node.
+\end{enumerate}
+
+\subsubsection*{Example 3: A whole sentence (\textit{Andy likes Billy})}
+The complete code looks like this (Notice the use of V $'$ for V-bar, and that we must always ensure every bracket is closed!)
+
+\begin{verbatim}
+\begin{forest}
+[S
+    [NP
+        [ProperN [Andy]]
+    ]
+    [VP
+        [V$'$
+            [V [likes]]
+            [NP 
+                [ProperN [Billy]]
+            ]
+        ]
+    ]
+]
+\end{forest}
+\end{verbatim}
+
+\noindent And here is the output:
+
+\ex.
+\begin{forest}
+[S
+    [NP
+        [ProperN [Andy]]
+    ]
+    [VP
+        [V$'$
+            [V [likes]]
+            [NP
+                [ProperN [Billy]]
+            ]
+        ]
+    ]
+]
+\end{forest}
+
+Note: in syntax, there is triangle to represent a whole phrase.
+We use the \texttt{root} command, just type \texttt{[...,roof]} after the node.
+
+\subsubsection*{Example 4: Roof (\textit{Andy likes little Billy})}
+\begin{verbatim}
+\begin{forest}
+[S
+    [NP
+        [ProperN [Andy]]
+    ]
+    [VP
+        [V$'$
+            [V [likes]]
+            [NP [little Billy, roof]
+            ]
+        ]
+    ]
+]
+\end{forest}
+\end{verbatim}
+
+Then we can get:
+\ex.
+\begin{forest}
+[S
+    [NP
+        [ProperN [Andy]]
+    ]
+    [VP
+        [V$'$
+            [V [likes]]
+            [NP [little Billy, roof]
+            ]
+        ]
+    ]
+]
+\end{forest}
+
+\noindent In the next section, we'll look at how to add types like $\langle e \rangle$ and $\langle t \rangle$ for semantics or $\phi$-features for formal syntax
+
+\subsection{Features}
+In formal Semantics (this course), a tree should be drawn like this:
+\begin{figure}[h]
+    \centering
+    \begin{forest}
+    for tree = {s sep = 10mm , inner sep = 0pt, l = 0pt}
+[DP
+    %[D \\[{$\langle \langle e,t \rangle,e \rangle$ \\ $\lambda P.\, \iota x.\text{P}(x)$}[the]]
+    [D \\{$\langle \langle e,t \rangle,e \rangle$ \\ $\lambda P.\, \iota x.\text{P}(x)$}
+    [the]]
+    [N$'$ \\ {$\langle e,t \rangle$ \\ $\lambda x.\,[\text{Textbook}(x) \land \text{On}(x,\text{sem})]$}
+        [N \\{$\langle e,t\rangle$ \\ $\lambda x.\,\text{Textbook}(x)$} [textbook]]
+        [PP \\{$\langle e,t \rangle$ \\ $\lambda x. \text{On}(x,\text{sem})$}
+            [P \\{$\langle e, \langle e,t \rangle \rangle$ \\ $\lambda y \lambda x. \text{On}(x,y)$} [on]]
+            [DP \\ e \\ sem [semantics]]
+    ]
+    ]
+
+]
+    \end{forest}
+    \caption{Adapted from Heim and Kratzer (1998, p.~5)}
+\end{figure}
+
+For semantic types, we use \{$\langle ...\rangle$\} after part of speech and before the word.
+Here is an example:
+\subsubsection*{Example 5: semantic types(\textit{Everything vanished})}
+
+We can type like this:
+\begin{verbatim}
+\begin{forest}
+for tree = { s sep = 10mm , inner sep = 0pt, l = 0pt}
+[S \\ t
+    [DP\\{$\langle \langle e,t \rangle, t\rangle$} [everything]]
+    [VP\\{$\langle e,t \rangle$}[V\\{$\langle e,t \rangle$}[vanised]]]
+]
+\end{forest}   
+\end{verbatim}
+
+Then the first semantic tree you have drawn in your life is:
+\ex.
+\begin{forest}
+for tree = { s sep = 10mm , inner sep = 0pt, l = 0pt}
+[S \\ t
+    [DP\\{$\langle \langle e,t \rangle, t\rangle$} [everything]]
+    [VP\\{$\langle e,t \rangle$}[V\\{$\langle e,t \rangle$}[vanised]]]
+]
+\end{forest}
+
+
+
+
+Adding a feature needs to be done like {[feature]}, which is to put curly brackets outside square brackets. 
+
+\textbf{Basic Feature:} Put the feature directly after the node's label, but before the children.
+
+We use line breaks (\texttt{\textbackslash\textbackslash}) and custom spacing (\texttt{s sep}) to achieve this.
+
+\subsubsection*{Example 6: $\phi$-feature(\textit{Marie Curie})}
+\ex.
+\begin{forest}
+    [ProperN[Marie Curie {[u$\phi$: 3rd, sg, fem]}]]
+\end{forest}
+
+
+\subsection {Movements}
+We need to draw arrows for movements, and this requires two steps: 
+\begin{enumerate}
+    \item \textbf{Naming Nodes:} Inside a node's square brackets, use the option \texttt{,name=LABEL}. For movement, you usually name the source (\texttt{src}) and the target (\texttt{tgt}).
+    \item \textbf{Drawing the Arrow:} The \texttt{\textbackslash draw} command is placed *after* the entire \texttt{forest} environment. \textbf{Here we are using a \texttt{TikZ} command. So the package \texttt{TikZ} should be added}
+\end{enumerate}
+
+\subsubsection*{Example 7: movement(\textit{A simple Wh-Movement example})}
+\ex. \textbf{Wh-Movement example}
+\begin{forest}
+for tree={s sep=10mm, inner sep=0, l=0}
+[CP
+    [DP,name=tgt]
+    [IP
+        [,phantom]
+        [VP
+            [DP]
+            [V$'$ [V] [\sout{DP},name=src]]
+        ]
+    ]
+]
+\draw[$->$] (src) to[out=south west,in=south] (tgt);
+\end{forest}
+
+\noindent \textit{The \texttt{phantom} node is useful for maintaining horizontal spacing without drawing a line, and \texttt{\textbackslash sout\{...\}} strikes through the copy.}
+
+\subsection{Final Notes}
+Here are some basic possible errors you might encounter when the compiler breaks dowm. :(
+
+Check through all these
+\begin{itemize}
+    \item Always \textbf{close every bracket}.
+    \item Start simple, then delve into complexity.
+    \item Some are not included in main text, so please use comments to annotate your code for future reference.
+\end{itemize}
+
+\section {Drawing Trees with the \texttt{qtree} Package}
+The \texttt{qtree} package uses a bracketed string format inside the \textbackslash Tree command. It’s great for quick, small trees.
+
+Basic syntax:
+\verb|\Tree [.S [.NP Kitty ] [.VP meows ] ]|
+
+It will produce:
+\Tree [.S [.NP Kitty ] [.VP meows ] ]
+\subsection{Examples}
+For \textit{Andy likes Billy}
+\Tree [.S 
+    [.NP [.ProperN Andy ] ] 
+    [.VP 
+        [.V$'$ 
+            [.V likes ] 
+            [.NP [.ProperN Billy ] ] 
+        ] 
+    ] 
+]
+
+\subsection{Limitations}
+As it cannot do the followings:
+\begin{itemize}
+    \item No semantic types or lambda annotations
+    \item No arrows or movement lines
+    \item No control over spacing or styling
+    \item No node naming or referencing
+\end{itemize}
+This is not our main focus.
+\section{Appendix: Set theory}
+
+\begin{center} 
+\begin{tabular}{lll}
+\toprule
+\emph{description} & \emph{command} & \emph{output}\\
+\midrule
+set brackets & \verb!\{1,2,3\}! & $\{1,2,3\}$\\
+element of & \verb!\in! & $\in$\\
+not an element of & \verb!\not\in! & $\not\in$\\
+subset of & \verb!\subset! & $\subset$\\
+subset of & \verb!\subseteq! & $\subseteq$\\
+not a subset of & \verb!\not\subset! & $\not\subset$\\
+contains & \verb!\supset! & $\supset$\\
+contains & \verb!\supseteq! & $\supseteq$\\
+union & \verb!\cup! & $\cup$\\
+intersection & \verb!\cap! & $\cap$\\
+big union & 
+\verb!\bigcup_{n=1}^{10}A_n! &
+$ \bigcup_{n=1}^{10}A_{n}$\\
+\addlinespace
+big intersection & \verb!\bigcap_{n=1}^{10}A_n! &$ \bigcap_{n=1}^{10}A_{n}$\\
+empty set & \verb!\emptyset! & $\emptyset$\\
+power set & \verb!\mathcal{P}! & $\mathcal{P}$\\
+minimum & \verb!\min! & $\min$\\
+maximum & \verb!\max! & $\max$\\
+supremum & \verb!\sup! & $\sup$\\
+infimum & \verb!\inf! & $\inf$\\
+limit superior & \verb!\limsup! & $\limsup$\\
+limit inferior & \verb!\liminf! & $\liminf$\\
+closure & \verb!\overline{A}! & $\overline{A}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{spacing}
+\begin{center}
+    \Huge
+    \textbf{Thanks! Have fun with coding!}
+\end{center}
+
+\end{document}
